@@ -1,0 +1,17 @@
+id: Siarko.Plugins.default
+
+arguments:
+  \Siarko\ConfigFiles\Modifier\ModifierManager:
+    modifiers:
+      - \Siarko\Plugins\Config\Modifier\PluginDefinitionModifier
+  \Siarko\Plugins\Config\Runtime\Alias\PluginAliasProvider:
+    pluginLibrary: !type:object(unique) \Siarko\Plugins\PluginLibrary
+  \Siarko\DependencyManager\Config\Runtime\Alias\AliasManager:
+    aliasProviders:
+      - !type:object(unique) \Siarko\Plugins\Config\Runtime\Alias\PluginAliasProvider
+  \Siarko\DependencyManager\Generator\CodeGenerator:
+    generators:
+      - \Siarko\Plugins\Generator\Developer\Interceptor\InterceptorGenerator
+  \Siarko\DependencyManager\Config\Runtime\Argument\ArgumentResolver:
+    customResolvers:
+      - \Siarko\Plugins\Config\Runtime\Argument\InterceptorArgumentResolver

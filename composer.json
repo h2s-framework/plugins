@@ -1,0 +1,23 @@
+{
+  "name": "siarkowodor/h2s-plugins",
+  "description": "H2S Framework Plugin System Module",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "version": "0.1.0",
+  "type": "library",
+  "authors": [
+    {
+      "name": "H2S",
+      "email": "mateusz@siarko.pl"
+    }
+  ],
+  "require": {
+    "siarkowodor/h2s-dependency-manager": "^0.1.0",
+    "siarkowodor/h2s-utils": "^0.1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Siarko\\Plugins\\": "src/"
+    }
+  }
+}
