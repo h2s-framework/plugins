@@ -3,7 +3,6 @@
   "description": "H2S Framework Plugin System Module",
   "minimum-stability": "stable",
   "license": "proprietary",
-  "version": "0.1.0",
   "type": "library",
   "authors": [
     {
