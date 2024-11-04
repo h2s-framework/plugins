@@ -2,8 +2,7 @@
 
 namespace Siarko\Plugins\Config\Plugin\Execution;
 
-use Siarko\Plugins\Config\Plugin\Instance\PluginInstanceProvider;
-use Siarko\Plugins\Exception\Config\Plugin\PluginDefinitionNotFoundException;
+use Siarko\Plugins\Exception\Config\Plugin\Definition\PluginDefinitionNotFoundException;
 use Siarko\Plugins\PluginLibrary;
 
 class PluginExecutor
@@ -11,11 +10,11 @@ class PluginExecutor
 
     /**
      * @param PluginLibrary $pluginLibrary
-     * @param PluginInstanceProvider $instanceProvider
+     * @param PluginInstanceProvider $pluginInstanceProvider
      */
     public function __construct(
         private readonly PluginLibrary $pluginLibrary,
-        private readonly PluginInstanceProvider $instanceProvider
+        private readonly PluginInstanceProvider $pluginInstanceProvider
     )
     {
     }
@@ -59,7 +58,7 @@ class PluginExecutor
             return $callback(...$arguments);
         }
 
-        $pluginInstance = $this->instanceProvider->getInstance(key($nextPluginConfig));
+        $pluginInstance = $this->pluginInstanceProvider->get(key($nextPluginConfig));
         $executionTypes = current($nextPluginConfig);
         $callbackArguments = func_get_args();
 

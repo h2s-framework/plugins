@@ -3,11 +3,16 @@
 namespace Siarko\Plugins\Config\Plugin\Definition;
 
 use Siarko\Plugins\Config\Plugin\Execution\PluginExecution;
-use Siarko\Plugins\Exception\Config\Plugin\PluginMethodDefinitionException;
+use Siarko\Plugins\Exception\Config\Plugin\Definition\PluginMethodDefinitionException;
 use Siarko\Serialization\Api\Json\SerializableInterface;
 
 class PluginDefinition implements SerializableInterface
 {
+    public const KEY_PLUGIN_CLASS = 'pluginClass';
+    public  const KEY_ENABLED = 'enabled';
+    public  const KEY_SORT_ORDER = 'sortOrder';
+    public  const KEY_METHODS = 'methods';
+
 
     use Serialization\PluginDefinition;
 

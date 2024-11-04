@@ -25,9 +25,18 @@ class PluginAliasProvider implements AliasProviderInterface
      */
     public function getAlias(string $className, string $foundName): string
     {
-        if($this->pluginLibrary->pluginRegistered($foundName)){
+        if(!$this->isInterceptor($foundName) && $this->pluginLibrary->pluginRegistered($foundName)){
             return $foundName.InterceptorGenerator::SUFFIX;
         }
         return $foundName;
+    }
+
+    /**
+     * @param string $foundName
+     * @return bool
+     */
+    private function isInterceptor(string $foundName): bool
+    {
+        return str_ends_with($foundName, InterceptorGenerator::SUFFIX);
     }
 }

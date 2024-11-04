@@ -5,9 +5,10 @@ namespace Siarko\Plugins\Config\Modifier;
 use Siarko\ConfigFiles\Api\Modifier\ModifierInterface;
 use Siarko\ConfigFiles\Api\Modifier\ModifierManagerInterface;
 use Siarko\DependencyManager\Config\Init\Modifier\Builder\ArgumentInjector;
+use Siarko\DependencyManager\Generator\Developer\Proxy\ProxyGenerator;
 use Siarko\Files\Api\FileInterface;
 use Siarko\Plugins\Config\Plugin\Definition\PluginDefinitionBuilder;
-use Siarko\Plugins\Config\Plugin\Instance\PluginInstanceProvider;
+use Siarko\Plugins\Config\Plugin\Execution\PluginInstanceProvider;
 use Siarko\Plugins\PluginLibrary;
 
 class PluginDefinitionModifier implements ModifierInterface
@@ -16,7 +17,7 @@ class PluginDefinitionModifier implements ModifierInterface
     public const PLUGIN_KEY = 'plugins';
 
     public const LIBRARY_CONFIG_ARGUMENT = 'config';
-    public const INSTANCE_PROVIDER_ARGUMENT = 'instances';
+    public const INSTANCE_PROVIDER_ARGUMENT = 'plugins';
 
     /**
      * @param ArgumentInjector $argumentInjector
@@ -73,8 +74,9 @@ class PluginDefinitionModifier implements ModifierInterface
                 $result[$parentClassName] = [$this->pluginDefinitionBuilder->buildDefinition($pluginConfig)];
             }else{
                 $result[$parentClassName] = [];
-                foreach ($pluginConfig as $index => $pluginType) {
-                    $result[$parentClassName][$index] = $this->pluginDefinitionBuilder->buildDefinition($pluginType);
+                $index = 0;
+                foreach ($pluginConfig as $i => $pluginType) {
+                    $result[$parentClassName][$index++] = $this->pluginDefinitionBuilder->buildDefinition($pluginType);
                 }
             }
         }
@@ -90,7 +92,7 @@ class PluginDefinitionModifier implements ModifierInterface
         $result = [];
         foreach ($pluginDefinitions as $pluginDefinition) {
             foreach ($pluginDefinition as $pluginType) {
-                $result[$pluginType->getPluginClass()] = $pluginType->getPluginClass();
+                $result[$pluginType->getPluginClass()] = $pluginType->getPluginClass().ProxyGenerator::SUFFIX;
             }
         }
         return $result;

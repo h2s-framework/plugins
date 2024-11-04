@@ -3,16 +3,14 @@
 namespace Siarko\Plugins\Config\Plugin\Definition;
 
 use Siarko\Plugins\Config\Attribute\PluginMethod;
-use Siarko\Plugins\Exception\Config\Plugin\PluginDefinitionErrorException;
+use Siarko\Plugins\Exception\Config\Plugin\Definition\PluginDefinitionErrorException;
 use Siarko\Utils\Code\ClassStructureProvider;
 use Siarko\Utils\Code\MethodStructure;
 
 class PluginDefinitionBuilder
 {
 
-    private const KEY_PLUGIN_CLASS = 'class';
-    private const KEY_ENABLED = 'enabled';
-    private const KEY_SORT_ORDER = 'sortOrder';
+    private const CONFIG_KEY_CLASS = 'class';
 
     /**
      * @param ClassStructureProvider $classStructureProvider
@@ -33,7 +31,7 @@ class PluginDefinitionBuilder
     public function buildDefinition(string|array $config): PluginDefinition
     {
         $config = $this->parseConfig($config);
-        $pluginClassName = $config[self::KEY_PLUGIN_CLASS];
+        $pluginClassName = $config[PluginDefinition::KEY_PLUGIN_CLASS];
         $classStructure = $this->classStructureProvider->get($pluginClassName);
         $pluginMethods = $classStructure->getMethods(\ReflectionMethod::IS_PUBLIC);
         $pluginMethods = array_map(fn($method) => $method->getName(), array_filter($pluginMethods, function(MethodStructure $method){
@@ -41,10 +39,10 @@ class PluginDefinitionBuilder
         }));
         $className = ltrim($pluginClassName, '\\');
         return $this->pluginDefinitionFactory->create([
-            'pluginClass' => $className,
-            'enabled' => $config[self::KEY_ENABLED],
-            'sortOrder' => $config[self::KEY_SORT_ORDER],
-            'methods' => $pluginMethods
+            PluginDefinition::KEY_PLUGIN_CLASS => $className,
+            PluginDefinition::KEY_ENABLED => $config[PluginDefinition::KEY_ENABLED],
+            PluginDefinition::KEY_SORT_ORDER => $config[PluginDefinition::KEY_SORT_ORDER],
+            PluginDefinition::KEY_METHODS => $pluginMethods
         ]);
 
     }
@@ -52,20 +50,21 @@ class PluginDefinitionBuilder
     /**
      * @param array|string $config
      * @return array
+     * @throws PluginDefinitionErrorException
      */
     private function parseConfig(array|string $config): array
     {
         if(is_string($config)){
             return [
-                self::KEY_ENABLED => true,
-                self::KEY_SORT_ORDER => null,
-                self::KEY_PLUGIN_CLASS => $config
+                PluginDefinition::KEY_ENABLED => true,
+                PluginDefinition::KEY_SORT_ORDER => null,
+                PluginDefinition::KEY_PLUGIN_CLASS => $config
             ];
         }
         return [
-            self::KEY_ENABLED => $config[self::KEY_ENABLED] ?? true,
-            self::KEY_SORT_ORDER => $config[self::KEY_SORT_ORDER] ?? null,
-            self::KEY_PLUGIN_CLASS => $config[self::KEY_PLUGIN_CLASS]
+            PluginDefinition::KEY_ENABLED => $config[PluginDefinition::KEY_ENABLED] ?? true,
+            PluginDefinition::KEY_SORT_ORDER => $config[PluginDefinition::KEY_SORT_ORDER] ?? null,
+            PluginDefinition::KEY_PLUGIN_CLASS => $config[self::CONFIG_KEY_CLASS]
                 ?? throw new PluginDefinitionErrorException('Plugin class not defined in plugin definition config')
         ];
     }

@@ -2,8 +2,8 @@
 
 namespace Siarko\Plugins;
 
+use Siarko\Plugins\Config\Plugin\Definition\Code\ClassTypeMapper;
 use Siarko\Plugins\Config\Plugin\Definition\PluginDefinition;
-use Siarko\Plugins\Exception\Config\Plugin\PluginDefinitionNotFoundException;
 
 class PluginLibrary
 {
@@ -12,34 +12,27 @@ class PluginLibrary
      * @var string[][][]
      */
     private ?array $pluginData = null;
+    private array $definitions = [];
 
     /**
      * @param PluginDefinition[][] $config
      */
     public function __construct(
+        private readonly ClassTypeMapper $classTypeMapper,
         private readonly array $config = []
     )
     {
+        $this->classTypeMapper->map(array_keys($config));
     }
 
     /**
-     * @param string $typeName
+     * @param string $aliasedType
      * @return bool
      */
-    public function pluginRegistered(string $typeName): bool
+    public function pluginRegistered(string $aliasedType): bool
     {
-        return class_exists($typeName) && ($this->searchExplicitDefinition($typeName) || $this->searchImplementation($typeName));
-    }
-
-    /**
-     * @param string $typeName
-     * @return PluginDefinition[]
-     * @throws PluginDefinitionNotFoundException
-     */
-    public function getPluginConfig(string $typeName): array
-    {
-        return $this->config[ltrim($typeName, '\\')]
-            ?? throw new PluginDefinitionNotFoundException("Plugin definition for type {$typeName} not found");
+        if(empty($this->config)){ return false; }
+        return $this->pluginsExists($aliasedType);
     }
 
     /**
@@ -50,34 +43,48 @@ class PluginLibrary
      */
     public function getPluginsForMethod(string $typeName, string $methodName): array
     {
+        if($this->definitions[$typeName][$methodName] ?? false){
+            return $this->definitions[$typeName][$methodName];
+        }
+        if($this->definitions[$typeName] ?? false){
+            $this->definitions[$typeName] = [];
+        }
+        return ($this->definitions[$typeName][$methodName] = $this->getDefinitionsForType($typeName, $methodName));
+    }
+
+    /**
+     * @param string $typeName
+     * @param string $methodName
+     * @return array
+     */
+    private function getDefinitionsForType(string $typeName, string $methodName): array {
         if($this->pluginData === null){
             $this->pluginData = $this->buildAllPluginData();
         }
-        return $this->pluginData[$typeName][$methodName] ?? [];
-    }
-
-    /**
-     * @param string $typeName
-     * @return bool
-     */
-    private function searchExplicitDefinition(string $typeName): bool
-    {
-        return array_key_exists($typeName, $this->config);
-    }
-
-    /**
-     * @param string $typeName
-     * @return bool
-     */
-    private function searchImplementation(string $typeName): bool
-    {
-
-        if(!str_ends_with($typeName, 'Interface')){
-            return false;
+        $implementations = array_merge(
+            [$typeName],
+            $this->classTypeMapper->getImplementations($typeName),
+            $this->classTypeMapper->getExtends($typeName)
+        );
+        $definitions = [];
+        foreach ($implementations as $implementation) {
+            $definitions = array_merge($definitions, $this->pluginData[$implementation][$methodName] ?? []);
         }
-        return false;
-        // TODO Implement this
+        return $definitions;
     }
+
+    /**
+     * @param string $typeName
+     * @return bool
+     */
+    private function pluginsExists(string $typeName): bool
+    {
+        if(array_key_exists($typeName, $this->config)){ return true; }
+        if(!class_exists($typeName)){ return false;}
+        $implementation = $this->classTypeMapper->getImplementations($typeName);
+        return !empty($implementation) || !empty($this->classTypeMapper->getExtends($typeName));
+    }
+
 
     /**
      * @return string[][][]

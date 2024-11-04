@@ -4,6 +4,7 @@
   "minimum-stability": "stable",
   "license": "proprietary",
   "type": "library",
+  "version": "0.1.2",
   "authors": [
     {
       "name": "H2S",
@@ -11,8 +12,8 @@
     }
   ],
   "require": {
-    "h2sf/dependency-manager": "^0.1.0",
-    "h2sf/utils": "^0.1.0"
+    "h2sf/dependency-manager": "^0.1.1",
+    "h2sf/utils": "^0.1.2"
   },
   "autoload": {
     "psr-4": {

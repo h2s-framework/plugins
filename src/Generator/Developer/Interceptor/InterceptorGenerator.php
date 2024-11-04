@@ -171,7 +171,7 @@ class InterceptorGenerator implements \Siarko\DependencyManager\Generator\IGener
     {
         $docBlock = $method->getDocBlock();
         $result = '';
-        foreach ($docBlock?->children as $child) {
+        foreach ($docBlock?->children ?? [] as $child) {
             $result .= $child."\n";
         }
         return $result;
