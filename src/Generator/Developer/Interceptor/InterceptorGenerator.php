@@ -118,7 +118,7 @@ class InterceptorGenerator implements \Siarko\DependencyManager\Generator\IGener
         $params = implode(',', $params);
         $parentExecutionCode = 'function('.$params."){\n\t".($returnsData ? 'return ' : ''). 'parent::'.$method->getName()."($params);\n}";
         $pluginExecutionCode = ($returnsData ? 'return ' : '').
-            '$this->__pluginExecutor->execute($this, \''.$method->getName().'\', func_get_args(),'.$parentExecutionCode.');';
+            '$this->__pluginExecutor->execute($this, \''.$method->getName().'\', ['.$params.'],'.$parentExecutionCode.');';
         $newMethod->setBody($pluginExecutionCode);
     }
 
@@ -160,6 +160,7 @@ class InterceptorGenerator implements \Siarko\DependencyManager\Generator\IGener
         $paramType = $parameter->getType();
         if($paramType){
             $newParam->setType($paramType->getName());
+            $newParam->setNullable($paramType->allowsNull());
         }
     }
 
